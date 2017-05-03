@@ -7,7 +7,7 @@
     <meta name="author" content="">
     <!--link rel="icon" href="../../favicon.ico"-->
 
-    <title>Blog Template for Bootstrap</title>
+    <title>SWAP SPACE BOX</title>
 
     <!-- Bootstrap core CSS -->
     <link href="styles/bootstrap.min.css" rel="stylesheet">
