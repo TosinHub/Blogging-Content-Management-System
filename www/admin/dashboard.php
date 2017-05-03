@@ -33,7 +33,7 @@ session_start();
 
 if(isset($_GET['delete'])){
 			
-				Tools::deleteProduct($conn,$_GET['delete']);
+				Tools::deletePost($conn,$_GET['delete']);
 			}
 
 if(isset($_GET['success']))
@@ -67,7 +67,7 @@ if(isset($_GET['success']))
 					
 
 						<?php 
-        $query = "SELECT * FROM blog_posts";       
+        $query = "SELECT * FROM blog_posts ORDER BY postID DESC";       
 		$posts_per_page=5;
 		$newquery = $paginate->paging($query,$posts_per_page);
 		$paginate->dataview($newquery);

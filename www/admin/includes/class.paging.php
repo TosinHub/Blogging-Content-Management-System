@@ -130,9 +130,9 @@ class paginate
             <h2 class="blog-post-title"><?php echo $title ?></h2>
             <p class="blog-post-meta"><?php echo 'Posted on '.date('jS M Y H:i:s', strtotime($date)).''?>
              By <a href="#"><?php echo $admin."<br/>" ?></a> Category:<?php echo $cat ?> </p>
-            <?php  ?>
-             <?php echo  "<img src='admin/". $image_path."' height='200px' width='200px'/>"; echo substr($post, 0, 200) . '<strong><a href="viewpost.php?id='.$row['postID'].'">Read More</a></strong>';	 ?>
-           
+            
+             <?php echo  "<img src='admin/". $image_path."' height='200px' width='200px' style='float:left'/>"; echo substr($post, 0, 300) . '<strong><a href="viewpost.php?id='.$row['postID'].'">Read More</a></strong>';	 ?>
+           </p>
           </div>
 
 
