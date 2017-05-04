@@ -9,9 +9,21 @@ session_start();
  include 'includes/function.php';
 
 
- $page_title = "Dashboard";
+ 	if(isset($_GET['delete'])){
+							
+								Tools::deletePost($conn,$_GET['delete']);
+							}
 
- include 'includes/header.php';
+	if(isset($_GET['archive'])){
+							
+								Tools::achieveNow($conn,$_GET['postID'],$_GET['archive']);
+							}
+
+
+
+	 $page_title = "Dashboard";
+
+	 include 'includes/header.php';
 ?>
 
 
@@ -31,18 +43,12 @@ session_start();
 
 <?php 
 
-if(isset($_GET['delete'])){
 			
-				Tools::deletePost($conn,$_GET['delete']);
-			}
+				if(isset($_GET['success']))
+						{
 
-if(isset($_GET['success']))
-		{
-
-			echo $_GET['success'];
-		}
-
-
+							echo $_GET['success'];
+						}
 
 ?>
 
@@ -61,6 +67,7 @@ if(isset($_GET['success']))
 						<th>Featured Image</th>
 						<th>edit</th>
 						<th>delete</th>
+						<th>Archive</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -77,9 +84,8 @@ if(isset($_GET['success']))
 						
           		</tbody>
 			</table>
-		</div>
-		
-		<div class="paginated">
+
+				<div class="paginated">
 		<?php 	$paginate->paginglink($query,$posts_per_page); ?>
 		</div>
 	</div>

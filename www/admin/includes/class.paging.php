@@ -9,6 +9,9 @@ class paginate
 		$this->db = $conn;
 	}
 
+
+
+
 	public function getAdmin($id){
 				 $stmt = $this->db->prepare("SELECT * FROM blog_member WHERE memberID = :id ");
 				 $stmt->bindParam(":id", $id);
@@ -52,12 +55,18 @@ class paginate
 	 			$cat_id = $row['cat_id'];
 	 			$date = $row['postDate'];
 	 			$image_path = $row['image_path'];
+	 			$flag = $row['flag'];
 
 	 			$get = $this->getAdmin($admin_id);
 	 			$admin = $get['username'];
 
 	 			$get = $this->getCat($cat_id);
 	 			$cat = $get['cat_name'];
+
+				  $convert_date = strtotime($date);
+        		  $month = date('F',$convert_date);
+        		  $year = date('Y',$convert_date);
+                  $dateF = $month . " " . $year;
 				?>
 
 
@@ -70,12 +79,21 @@ class paginate
 	 			 <td><?php echo $date ?></td>
 	 			 <td><img src='<?php echo $image_path?>'  height='100px' width='100px' /></td>
 	 			 <td><a href='edit_post.php?post_id=<?php echo $post_id ?>'>edit</a></td>
-				 <td><a href='dashboard.php?delete=<?php echo $post_id ?>'>delete</a></td></tr>
+				 <td><a href='dashboard.php?delete=<?php echo $post_id ?>'>delete</a></td>
+				 <?php if($flag == "" ){ ?>
+				 <td><a href='dashboard.php?archive=<?php echo $date ?>&postID=<?php echo $post_id ?>'>Archive</a></td></tr>
+				  <?php }else{ ?>
+				<td><a href='#'>Archived</a></td></tr>
+
+				
+				<?php
+
+				  	} 
 
 
 
-
-                <?php
+                
+            
 			}
 
 
@@ -83,15 +101,7 @@ class paginate
 
 
 		}
-		else
-		{
-			?>
-            <tr>
-            <td>No product posted yet</td>
-            </tr>
-            <?php
-		}
-		
+
 	}
 
 

@@ -205,14 +205,19 @@ class Tools {
 
 				  $date = date('Y-m-d H:i:s');
 
-                  $stmt = $dbconn->prepare("INSERT INTO blog_posts(cat_id,postTitle,postCont,postDate,admin_id,image_path) 
-                  	VALUES (:t,:a,:c,:p,:y,:im)");
+				 
+                  $dateF = "";
+				  
+
+                  $stmt = $dbconn->prepare("INSERT INTO blog_posts(cat_id,postTitle,postCont,postDate,admin_id,image_path,flag) 
+                  	VALUES (:t,:a,:c,:p,:y,:im,:sl)");
 
 	 					
 
 	 			$data = [
 	 					':t' => $input['cat'],
 	 					':a' => $input['title'],
+	 					':sl' => $dateF,
 	 					':c' => $input['post'],
 	 					':p' => $date,
 	 					':y' => $input['admin_id'],
@@ -240,6 +245,16 @@ class Tools {
                  
 
 		}
+
+	
+
+
+
+		
+	
+
+
+		
 
 
 
@@ -318,16 +333,6 @@ class Tools {
 			}
 
 
-	public static function nowBook($dbconn,$book_id){
-				 $stmt = $dbconn->prepare("SELECT * FROM book WHERE book_id = :id ");
-				 $stmt->bindParam(":id", $book_id);
-				 $stmt->execute();
-				
-
-	 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
-	 			return $row;
-
-	 		}
 
 
 	public static	function newCat($dbconn,$id){
@@ -342,24 +347,7 @@ class Tools {
 	 		}
 
 
-	public static	function authenticate ()
-		{
-
-				if(!isset($_SESSION['active']))
-
-				{
-
-
-
-
-					redirect("login.php?message=Please login");
-
-					
-				} 
-
-
-		}
-
+	
 
 	public static	function rowCount($dbconn,$place){
 
@@ -412,9 +400,169 @@ class Tools {
 				echo '<span class="form-error">'.$show[$input]. '</span>' ;
 				//return true;
         }
+
+
+    }
+
+    public static function achieveNow($dbconn,$id,$date){
+
+    		  $stmt = $dbconn->prepare("INSERT INTO archive(postID,date) 
+                  	VALUES (:t,:a)");
+
+    		  $stmt->bindParam(":t", $id);
+    		  $stmt->bindParam(":a", $date);
+    		   if($stmt->execute()){
+    		   	self::updatePost($dbconn,$id);
+
+
+    		   }
+
+
     }
 
 
-  }   
+    public static function updatePost($dbconn,$id){
 
+    			  $flag = "archive";
+                  $stmt = $dbconn->prepare("UPDATE blog_posts 
+                  	SET flag = :t  	WHERE postID = :id");
+
+	 		//bind params
+
+	 			$data = [
+	 					':t' => $flag,
+	 					':id' => $id
+
+	 					];
+
+
+	 			if($stmt->execute($data)){;
+
+                  $success = "Product Edited";
+                  header("Location:dashboard.php?success=$success");
+
+                 }
+
+             else
+                 
+                {        
+                		 $success = "Flag not updated";
+                  header("Location:dashboard.php?success=$success");
+
+
+               }
+           }
+
+           public static function fetchArchive($dbconn){
+           	$result = "";
+           	$stmt = $dbconn->prepare("SELECT DISTINCT date FROM archive ");
+           	$stmt->execute();
+           	while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+           		  $date = $row['date'];
+           		  $convert_date = strtotime($date);
+        		  $month = date('F',$convert_date);
+        		  $year = date('Y',$convert_date);
+                  $dateF = $month . " " . $year;
+
+           		
+           		$result .= "<li><a href='archive.php?date=$dateF'> $dateF</a></li>";
+
+           	}
+           	return $result;
+           }
+
+
+
+
+           public static function archiveView($dbconn, $id)
+	{
+		$stmt = $dbconn->prepare("SELECT * FROM blog_posts WHERE formatDate = :d ORDER BY postID DESC");
+		$stmt->bindParam(":d", $id);
+		$stmt->execute();
+	
+		if($stmt->rowCount()>0)
+		{
+			while($row=$stmt->fetch(PDO::FETCH_ASSOC))
+			{
+
+//cat_id,postTitle,postCont,postDate,admin_id,image_path
+
+
+				$post_id = $row['postID'];
+	 			$title = $row['postTitle'];
+	 			$admin_id = $row['admin_id'];
+	 			$cat_id = $row['cat_id'];
+	 			$post = $row['postCont'];
+	 			$date = $row['postDate'];
+	 			$image_path = $row['image_path'];
+
+	 			$get = self::getAdmin($dbconn,$admin_id);
+	 			$admin = $get['username'];
+
+	 			$get = self::getCat($dbconn,$cat_id);
+	 			$cat = $get['cat_name'];
+				?>
+
+
+				
+
+				 <div class="blog-post">
+            <h2 class="blog-post-title"><?php echo $title ?></h2>
+            <p class="blog-post-meta"><?php echo 'Posted on '.date('jS M Y H:i:s', strtotime($date)).''?>
+             By <a href="#"><?php echo $admin."<br/>" ?></a> Category:<?php echo $cat ?> </p>
+            
+             <?php echo  "<img src='admin/". $image_path."' height='200px' width='200px' style='float:left'/>"; echo substr($post, 0, 300) . '<strong><a href="viewpost.php?id='.$row['postID'].'">Read More</a></strong>';	 ?>
+           </p>
+          </div>
+
+
+                <?php
+			}
+
+
+
+
+
+		}
+		else
+		{
+			?>
+            <tr>
+            <td>No product posted yet</td>
+            </tr>
+            <?php
+		}
+		
+	}
+
+
+
+
+	public static function getAdmin($dbconn,$id){
+				 $stmt = $dbconn->prepare("SELECT * FROM blog_member WHERE memberID = :id ");
+				 $stmt->bindParam(":id", $id);
+				 $stmt->execute();
+				
+
+	 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
+	 			return $row;
+
+
+	 		}
+
+	 public static function getCat($dbconn, $id){
+				 $stmt = $dbconn->prepare("SELECT * FROM category WHERE cat_id = :id ");
+				 $stmt->bindParam(":id", $id);
+				 $stmt->execute();
+				
+
+	 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
+	 			return $row;
+
+
+	 		}	
+
+}
+
+ 
 

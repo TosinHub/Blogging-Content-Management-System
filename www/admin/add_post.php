@@ -80,10 +80,14 @@
 	 	if(empty($errors)){
 	 		
 
-
+	 	
 
 	 		$clean = array_map('trim', $_POST);
-	 		 $clean["loc"] = $destination;
+	 		
+ 			$clean["slug"] = slug($clean['title']);
+ 	 		$clean["loc"] = $destination;
+
+	 		
 			Tools::addPost($conn,$clean);
               }
 
